@@ -42,7 +42,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
 @keyframes d2 { to { transform: translate(-18vw, -14vh) scale(.9); } }
 
 /* top bar */
-.topbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 16px; }
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 16px; direction: ltr; }
 .back { font: 600 13px/1 var(--f-mono); color: var(--muted); text-decoration: none; }
 .back:hover { color: var(--accent); }
 .brand { margin: 0; font: 600 12px/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
@@ -192,3 +192,15 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
 .desktop .desktop-title { color: var(--ink); font-weight: 700; font-size: 18px; }
 .desktop-url { font: 600 13px/1.4 var(--f-mono); color: var(--accent) !important; word-break: break-all; }
 .linkish { cursor: pointer; margin-top: 6px; background: none; border: 0; color: var(--muted); text-decoration: underline; font-size: 13px; }
+
+/* footer + legal sheet */
+.foot { max-width: 560px; margin: 0 auto; padding: 18px 16px 28px; display: flex; flex-wrap: wrap; gap: 6px 16px; justify-content: center; align-items: center;
+  border-top: 1px solid var(--line); font: 500 13px/1.4 var(--f-mono); color: var(--muted); }
+.foot a { color: var(--ink); text-decoration: none; }
+.foot a:hover { color: var(--accent); }
+.foot .linkish { margin: 0; font: inherit; }
+.legal-body { gap: 4px; font-size: 14.5px; }
+.legal-body h3 { margin: 14px 0 2px; font: 600 11px/1.4 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--blue); }
+.legal-body p, .legal-body li { margin: 0; color: #d3d3cf; }
+.legal-body ul { margin: 4px 0 0; padding-inline-start: 18px; display: grid; gap: 4px; }
+.legal-body a { color: var(--accent); }

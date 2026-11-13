@@ -18,6 +18,25 @@ const T = {
   he: {
     back: "← לאתר שלי", brand: "Object Compass", switchTo: "EN",
     eyebrow: "חיישני הטלפון × API חי", title: "מצפן אובייקטים",
+    legalBtn: "מקורות, פרטיות ותנאים", legalTitle: "מקורות, פרטיות ותנאים",
+    legalHtml: `<h3>לפני שמשתמשים</h3>
+<p>זה פרויקט לימודי וחינמי, והוא ניתן "כמו שהוא" (<bdi dir="ltr">AS IS</bdi>), בלי שום אחריות. הכיוונים, המרחקים, המיקומים והנתונים מגיעים מחיישני הטלפון ומשירותים חיצוניים, ויכולים להיות לא מדויקים, באיחור או לא זמינים. <b>אסור להשתמש באתר לניווט, לבטיחות, לתעופה או לכל החלטה שיש לה משמעות.</b> אל תסתכלו על המסך בזמן נהיגה או הליכה בכביש. השימוש באתר הוא על אחריותכם בלבד.</p>
+<h3>פרטיות</h3>
+<ul>
+<li>האתר לא אוסף, לא שומר ולא מוכר שום מידע. אין חשבונות, אין עוגיות מעקב ואין אנליטיקס.</li>
+<li>כדי לחשב מה סביבך, המיקום שלך (או כתובת שחיפשת) נשלח ישירות מהטלפון לשירותי הנתונים שמופיעים למטה, ולכל אחד מהם מדיניות פרטיות משלו.</li>
+<li>הגדרות, נקודות ששמרת והיעד האחרון נשמרים רק בדפדפן שלך, ואפשר למחוק אותם בניקוי נתוני האתר.</li>
+</ul>
+<h3>מקורות נתונים וקרדיטים</h3>
+<ul>
+<li>חיפוש כתובות: <a href="https://nominatim.openstreetmap.org/" target="_blank" rel="noopener">Nominatim</a>. נתונים © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>, ברישיון ODbL. השימוש לפי <a href="https://operations.osmfoundation.org/policies/nominatim/" target="_blank" rel="noopener">מדיניות השימוש של Nominatim</a>.</li>
+<li>מטוסים: <a href="https://adsb.lol" target="_blank" rel="noopener">ADSB.lol</a> (ODbL). מסלולי טיסה: <a href="https://www.adsbdb.com" target="_blank" rel="noopener">adsbdb</a>.</li>
+<li>לוויינים: נתוני מסלול מ-<a href="https://celestrak.org" target="_blank" rel="noopener">CelesTrak</a>, חישוב עם satellite.js.</li>
+<li>מזג אוויר וראות: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>, ברישיון CC BY 4.0.</li>
+<li>שמש וירח: חישוב מקומי בטלפון.</li>
+</ul>
+<h3>קשר</h3>
+<p>נבנה על ידי אלירן דיין. אם יש בעיה או בקשה, אפשר לפנות אליי בלינקדין.</p>`,
     desktopTitle: "האתר הזה בנוי לטלפון",
     desktopText: "המצפן עובד עם ה-GPS וחיישני הכיוון של הטלפון, ולמחשב אין אותם. פתח את הכתובת הזאת בטלפון:",
     desktopAnyway: "להמשיך בכל זאת (מצב תצוגה בלבד)",
@@ -82,6 +101,25 @@ const T = {
   en: {
     back: "← My site", brand: "Object Compass", switchTo: "עב",
     eyebrow: "Phone sensors × live APIs", title: "Object Compass",
+    legalBtn: "Sources, privacy & terms", legalTitle: "Sources, privacy & terms",
+    legalHtml: `<h3>Before you use it</h3>
+<p>This is a free student project, provided "AS IS" with no warranty of any kind. Directions, distances, positions and data come from your phone's sensors and outside services and may be wrong, late or unavailable. <b>Do not use it for navigation, safety, aviation or any decision that matters.</b> Don't watch the screen while driving or crossing a road. You use this site at your own risk.</p>
+<h3>Privacy</h3>
+<ul>
+<li>This site collects, stores and sells nothing. No accounts, no tracking cookies, no analytics.</li>
+<li>To work out what is around you, your location (or an address you search) is sent straight from your phone to the data services listed below, each with its own privacy policy.</li>
+<li>Settings, saved points and your last target stay only in your browser; clearing site data removes them.</li>
+</ul>
+<h3>Data sources and credits</h3>
+<ul>
+<li>Address search: <a href="https://nominatim.openstreetmap.org/" target="_blank" rel="noopener">Nominatim</a>. Data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>, ODbL. Used under the <a href="https://operations.osmfoundation.org/policies/nominatim/" target="_blank" rel="noopener">Nominatim usage policy</a>.</li>
+<li>Aircraft: <a href="https://adsb.lol" target="_blank" rel="noopener">ADSB.lol</a> (ODbL). Flight routes: <a href="https://www.adsbdb.com" target="_blank" rel="noopener">adsbdb</a>.</li>
+<li>Satellites: orbital elements from <a href="https://celestrak.org" target="_blank" rel="noopener">CelesTrak</a>, propagated with satellite.js.</li>
+<li>Weather and visibility: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>, CC BY 4.0.</li>
+<li>Sun and Moon: computed on your phone.</li>
+</ul>
+<h3>Contact</h3>
+<p>Built by Eliran Dayan. Problems or requests: reach me on LinkedIn.</p>`,
     desktopTitle: "This site is built for phones",
     desktopText: "The compass uses your phone's GPS and orientation sensors, which a computer doesn't have. Open this address on your phone:",
     desktopAnyway: "Continue anyway (view-only mode)",
@@ -874,6 +912,14 @@ function swipeToClose(dlg) {
   });
 }
 swipeToClose($("#picker"));
+swipeToClose($("#legal"));
+$("#legalBtn").addEventListener("click", () => {
+  const d = $("#legal"); d.dir = lang === "he" ? "rtl" : "ltr";
+  $("#legalBody").innerHTML = t().legalHtml;
+  d.showModal();
+});
+$("#legalClose").addEventListener("click", () => $("#legal").close());
+$("#legal").addEventListener("click", (e) => { if (e.target === $("#legal")) $("#legal").close(); });
 
 buildDial();
 applyLang();
