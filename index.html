@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Object Compass · Eliran Dayan</title>
+  <meta name="description" content="Point your phone at anything: landmarks, the plane above you, the ISS. A phone-sensor compass fed by live APIs.">
+  <meta name="theme-color" content="#111315">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Rubik:wght@400;500;700&family=Secular+One&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=2">
+</head>
+<body>
+  <div class="aurora" aria-hidden="true"><span class="a1"></span><span class="a2"></span><span class="a3"></span></div>
+
+  <header class="topbar">
+    <a class="back" href="https://eliran-technion.github.io/ME-AI_course/" data-i18n="back"></a>
+    <p class="brand"><span data-i18n="brand"></span></p>
+    <button type="button" class="pill" id="langBtn"></button>
+  </header>
+
+  <main class="app">
+    <!-- start overlay -->
+    <section class="start" id="start">
+      <p class="eyebrow" data-i18n="eyebrow"></p>
+      <h1 data-i18n="title"></h1>
+      <p class="lede" data-i18n="lede"></p>
+      <div class="desktop" id="desktop" hidden>
+        <p class="desktop-title" data-i18n="desktopTitle"></p>
+        <p data-i18n="desktopText"></p>
+        <p class="desktop-url" id="desktopUrl" dir="ltr"></p>
+        <button type="button" class="linkish" id="desktopAnyway" data-i18n="desktopAnyway"></button>
+      </div>
+      <button type="button" class="cta" id="startBtn" data-i18n="start"></button>
+      <p class="fine" data-i18n="startFine"></p>
+    </section>
+
+    <!-- compass -->
+    <section class="compass-wrap" id="compassWrap" hidden>
+      <div id="locPanel" hidden></div>
+      <button type="button" class="target-btn" id="pickBtn">
+        <span class="target-kind" id="tKind"></span>
+        <span class="target-name" id="tName"></span>
+        <span class="target-change" data-i18n="change"></span>
+      </button>
+
+      <div class="dial-row">
+        <div class="dial" id="dial">
+          <svg viewBox="0 0 400 400" aria-hidden="true">
+            <defs>
+              <radialGradient id="dg" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#1d2125"/><stop offset="100%" stop-color="#121417"/>
+              </radialGradient>
+            </defs>
+            <circle cx="200" cy="200" r="190" fill="url(#dg)" stroke="#2b3035" stroke-width="2"/>
+            <g id="rose"></g>
+            <g id="marker" class="marker"></g>
+            <path class="lubber" d="M200 4 L212 26 L188 26 Z"/>
+          </svg>
+          <div class="dial-center">
+            <p class="delta" id="delta">—</p>
+            <p class="delta-sub" id="deltaSub"></p>
+          </div>
+        </div>
+
+        <div class="elev" id="elev" aria-hidden="true">
+          <span class="elev-label">90°</span>
+          <div class="elev-bar">
+            <span class="elev-horizon"></span>
+            <span class="elev-target" id="elTarget"></span>
+            <span class="elev-phone" id="elPhone"></span>
+          </div>
+          <span class="elev-label">-10°</span>
+          <span class="elev-cap" data-i18n="elev"></span>
+        </div>
+      </div>
+
+      <div class="readouts" id="readouts"></div>
+      <div class="extra" id="extra"></div>
+
+      <div class="manual" id="manual" hidden>
+        <label for="manualHeading" data-i18n="manualLabel"></label>
+        <input type="range" id="manualHeading" min="0" max="359" value="0">
+      </div>
+
+      <p class="status" id="status"></p>
+      <p class="hint" id="hint" data-i18n="calib"></p>
+    </section>
+  </main>
+
+  <!-- target picker -->
+  <dialog class="sheet" id="picker">
+    <span class="grab" aria-hidden="true"></span>
+    <div class="sheet-head">
+      <h2 data-i18n="pickTitle"></h2>
+      <button type="button" class="x" id="pickClose" aria-label="Close">×</button>
+    </div>
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div class="list" id="list"></div>
+  </dialog>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/satellite.js@5.0.0/dist/satellite.min.js"></script>
+  <script src="config.js?v=2"></script>
+  <script src="app.js?v=2"></script>
+</body>
+</html>
