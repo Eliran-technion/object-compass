@@ -11,7 +11,7 @@
    ===================================================================== */
 (() => {
 "use strict";
-const CFG = Object.assign({ FLIGHT_PROXY: "", FLIGHT_RADIUS_NM: 60, MAG_DECLINATION: 5 }, window.OC_CONFIG || {});
+const CFG = Object.assign({ FLIGHT_PROXY: "", FLIGHT_RADIUS_NM: 150, SHIP_RADIUS_KM: 80, MAG_DECLINATION: 5 }, window.OC_CONFIG || {});
 
 /* ============================ strings ============================ */
 const T = {
@@ -31,6 +31,7 @@ const T = {
 <ul>
 <li>חיפוש כתובות: <a href="https://nominatim.openstreetmap.org/" target="_blank" rel="noopener">Nominatim</a>. נתונים © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>, ברישיון ODbL. השימוש לפי <a href="https://operations.osmfoundation.org/policies/nominatim/" target="_blank" rel="noopener">מדיניות השימוש של Nominatim</a>.</li>
 <li>מטוסים: <a href="https://adsb.lol" target="_blank" rel="noopener">ADSB.lol</a> (ODbL). מסלולי טיסה: <a href="https://www.adsbdb.com" target="_blank" rel="noopener">adsbdb</a>.</li>
+<li>ספינות: <a href="https://aisstream.io" target="_blank" rel="noopener">aisstream.io</a>, דרך שרת ביניים שמחזיק את המפתח.</li>
 <li>לוויינים: נתוני מסלול מ-<a href="https://celestrak.org" target="_blank" rel="noopener">CelesTrak</a>, חישוב עם satellite.js.</li>
 <li>מזג אוויר וראות: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>, ברישיון CC BY 4.0.</li>
 <li>שמש וירח: חישוב מקומי בטלפון.</li>
@@ -74,7 +75,15 @@ const T = {
     planesNone: "אין כרגע מטוסים בטווח.", loading: "טוען…",
     skyH: "שמש וירח", satPicksH: "מומלצים", satVisH: "לוויינים מעליך עכשיו",
     satNone: "אין כרגע לוויינים בהירים מעל האופק.", satErr: "לא הצלחתי לטעון נתוני לוויינים.",
-    shipsText: "ספינות בזמן אמת (AIS) זמינות רק דרך שירותים שדורשים מפתח פרטי, ומפתח כזה לא שמים בקוד של אתר. זה השלב הבא: אותו שרת ביניים של המטוסים יכול להחזיק את המפתח בצורה בטוחה.",
+    kShip: "ספינה", nearestShip: "הספינה הקרובה אליי עכשיו", nearestShipSub: "מתחלפת לבד: הקרובה ביותר מבין הספינות שמשדרות",
+    shipsLoading: "מאזין לשידורי הספינות באזור… זה לוקח עד 10 שניות.",
+    shipsNoKey: "שרת הביניים עדיין בלי מפתח הספינות (AIS_KEY). ברגע שיוגדר, הספינות יופיעו כאן.",
+    shipsErr: "לא הצלחתי למשוך ספינות כרגע. אנסה שוב עוד מעט.",
+    shipsNone: "אין כרגע ספינות שמשדרות בטווח. ספינות בעוגן משדרות רק כל כמה דקות, נסה שוב עוד רגע.",
+    shipsNoProxy: "ספינות דורשות את שרת הביניים, והוא עוד לא מוגדר ב-config.js.",
+    shipLost: "הספינה הפסיקה לשדר או יצאה מהטווח.",
+    speed: "מהירות", dest: (d) => `יעד: ${d}`,
+    shipTypes: { fishing: "דיג", tug: "גוררת", military: "צבאית", sailing: "מפרשית", pleasure: "יאכטה", fast: "כלי שיט מהיר", pilot: "סירת נתבים", passenger: "נוסעים", cargo: "מטען", tanker: "מכלית", other: "" },
     sun: "השמש", moon: "הירח",
     iss: "תחנת החלל הבינלאומית", css: "תחנת החלל הסינית טיאנגונג", hst: "טלסקופ החלל האבל",
     nextPass: (t, az, mx) => `המעבר הבא: <b>${t}</b>, יעלה מכיוון ${az}, ויגיע לגובה ${mx}°`,
@@ -114,6 +123,7 @@ const T = {
 <ul>
 <li>Address search: <a href="https://nominatim.openstreetmap.org/" target="_blank" rel="noopener">Nominatim</a>. Data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>, ODbL. Used under the <a href="https://operations.osmfoundation.org/policies/nominatim/" target="_blank" rel="noopener">Nominatim usage policy</a>.</li>
 <li>Aircraft: <a href="https://adsb.lol" target="_blank" rel="noopener">ADSB.lol</a> (ODbL). Flight routes: <a href="https://www.adsbdb.com" target="_blank" rel="noopener">adsbdb</a>.</li>
+<li>Ships: <a href="https://aisstream.io" target="_blank" rel="noopener">aisstream.io</a>, through a proxy that keeps the key private.</li>
 <li>Satellites: orbital elements from <a href="https://celestrak.org" target="_blank" rel="noopener">CelesTrak</a>, propagated with satellite.js.</li>
 <li>Weather and visibility: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>, CC BY 4.0.</li>
 <li>Sun and Moon: computed on your phone.</li>
@@ -157,7 +167,15 @@ const T = {
     planesNone: "No aircraft in range right now.", loading: "Loading…",
     skyH: "Sun & Moon", satPicksH: "Highlights", satVisH: "Satellites above you now",
     satNone: "No bright satellites above the horizon right now.", satErr: "Couldn't load satellite data.",
-    shipsText: "Live ships (AIS) are only available from services that need a private key, and a key never goes into a website's code. Next step: the same proxy used for aircraft can hold that key safely.",
+    kShip: "Ship", nearestShip: "The ship closest to me", nearestShipSub: "Switches on its own to the closest transmitting ship",
+    shipsLoading: "Listening to ship broadcasts nearby… this takes up to 10 seconds.",
+    shipsNoKey: "The proxy doesn't have the ships key (AIS_KEY) yet. Once it's set, ships will show up here.",
+    shipsErr: "Couldn't load ships right now. Retrying shortly.",
+    shipsNone: "No transmitting ships in range right now. Anchored ships report only every few minutes, try again soon.",
+    shipsNoProxy: "Ships need the proxy, which isn't set in config.js yet.",
+    shipLost: "This ship stopped transmitting or left the range.",
+    speed: "Speed", dest: (d) => `Destination: ${d}`,
+    shipTypes: { fishing: "Fishing", tug: "Tug", military: "Military", sailing: "Sailing", pleasure: "Yacht", fast: "High-speed craft", pilot: "Pilot boat", passenger: "Passenger", cargo: "Cargo", tanker: "Tanker", other: "" },
     sun: "The Sun", moon: "The Moon",
     iss: "International Space Station", css: "Tiangong space station", hst: "Hubble Space Telescope",
     nextPass: (t, az, mx) => `Next pass: <b>${t}</b>, rising in the ${az}, up to ${mx}°`,
@@ -266,6 +284,7 @@ const S = {
   satStatus: "idle",                    // idle | loading | ok | err
   passCache: new Map(),
   planes: [], planesAt: 0, planesStatus: CFG.FLIGHT_PROXY ? "idle" : "noproxy",
+  ships: [], shipsAt: 0, shipsStatus: CFG.FLIGHT_PROXY ? "idle" : "noproxy",
   routes: new Map(),
   weather: null, weatherAt: 0,
   aligned: false,
@@ -290,9 +309,11 @@ let geoWatch = null, geoAskTimer = null;
 const platform = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) ? "ios"
   : /Android/.test(navigator.userAgent) ? "android" : "desktop";
 function onFix(p) {
+  const first = !S.loc;
   S.loc = { lat: p.coords.latitude, lon: p.coords.longitude, altKm: (p.coords.altitude ?? 10) / 1000, acc: Math.round(p.coords.accuracy) };
   setLocState("ok");
   maybeRefreshWeather();
+  if (first) { schedulePlanes(); scheduleShips(); }   // live data can start the moment we know where you are
 }
 async function onGeoError(e) {
   if (S.loc) return;                                  // already have a live fix: ignore a passing hiccup
@@ -549,6 +570,43 @@ function planeLook(p, now, loc) {
   const d = distKm(loc.lat, loc.lon, pos.lat, pos.lon), hRel = p.altFt * 0.0003048 - (loc.altKm || 0);
   return { az: bearingTo(loc.lat, loc.lon, pos.lat, pos.lon), el: elevAngle(d, hRel), distKm: Math.hypot(d, hRel), ground: d };
 }
+
+/* ============================ ships (aisstream.io via the same worker) ============================ */
+let shipTimer = null;
+async function fetchShips() {
+  if (!CFG.FLIGHT_PROXY || !S.loc) return;
+  if (S.shipsStatus !== "ok") { S.shipsStatus = "loading"; refreshListIf("ships"); }
+  try {
+    const r = await fetch(`${CFG.FLIGHT_PROXY.replace(/\/$/, "")}/ships?lat=${S.loc.lat.toFixed(3)}&lon=${S.loc.lon.toFixed(3)}&r=${Math.min(120, CFG.SHIP_RADIUS_KM)}`);
+    if (r.status === 503) { S.shipsStatus = "nokey"; refreshListIf("ships"); return; }
+    if (!r.ok) throw 0;
+    const j = await r.json(), clientNow = Date.now();
+    S.ships = (j.ships || []).filter((s) => typeof s.lat === "number").map((s) => ({
+      id: String(s.mmsi), name: s.name || "", lat: s.lat, lon: s.lon, sog: s.sog || 0, cog: s.cog ?? s.heading ?? 0,
+      type: s.type, dest: s.dest || "", seenAt: clientNow - Math.max(0, (j.now || clientNow) - (s.t || j.now)),
+    }));
+    S.shipsAt = clientNow; S.shipsStatus = "ok";
+  } catch { S.shipsStatus = "err"; }
+  refreshListIf("ships");
+}
+function shipsNeeded() { return (S.target.kind === "ship") || ($("#picker").open && S.tab === "ships"); }
+function scheduleShips() {
+  clearInterval(shipTimer);
+  if (!CFG.FLIGHT_PROXY) return;
+  if (shipsNeeded()) { fetchShips(); shipTimer = setInterval(() => { if (shipsNeeded()) fetchShips(); }, 30000); }
+}
+function shipLook(s, now, loc) {
+  const dtH = Math.max(0, now - s.seenAt) / 3600e3;
+  const [lat, lon] = dtH > 0 && s.sog > 0.5 && dtH < 0.5 ? movePoint(s.lat, s.lon, s.cog, s.sog * 1.852 * dtH) : [s.lat, s.lon];
+  const d = distKm(loc.lat, loc.lon, lat, lon);
+  return { az: bearingTo(loc.lat, loc.lon, lat, lon), el: elevAngle(d, -(loc.altKm || 0)), distKm: d };
+}
+function shipType(code) {
+  const c = +code, k = !c ? "other" : c === 30 ? "fishing" : c === 31 || c === 32 || c === 52 ? "tug" : c === 35 ? "military" : c === 36 ? "sailing"
+    : c === 37 ? "pleasure" : c >= 40 && c < 50 ? "fast" : c === 50 ? "pilot" : c >= 60 && c < 70 ? "passenger" : c >= 70 && c < 80 ? "cargo" : c >= 80 && c < 90 ? "tanker" : "other";
+  return t().shipTypes[k];
+}
+const shipName = (s) => s.name || `MMSI ${s.id}`;
 async function lookupRoute(call) {
   if (!call || S.routes.has(call)) return;
   S.routes.set(call, null);
@@ -605,13 +663,21 @@ function resolveTarget(now) {
     lookupRoute(p.call);
     return { kindLabel: t().kPlane, name: tg.id === "nearest" ? `${t().nearestPlane} · ${p.call || p.id}` : (p.call || p.id), ...l, plane: p };
   }
+  if (tg.kind === "ship") {
+    const s = tg.id === "nearest"
+      ? S.ships.map((x) => [x, shipLook(x, now, loc).distKm]).sort((a, b) => a[1] - b[1])[0]?.[0]
+      : S.ships.find((x) => x.id === tg.id);
+    const name = tg.id === "nearest" ? t().nearestShip : (tg.name || tg.id);
+    if (!s) return { kindLabel: t().kShip, name, pending: true, lost: tg.id !== "nearest" && S.shipsStatus === "ok" && S.shipsAt > 0 };
+    return { kindLabel: t().kShip, name: tg.id === "nearest" ? `${t().nearestShip} · ${shipName(s)}` : shipName(s), ...shipLook(s, now, loc), ship: s, surface: true };
+  }
   return null;
 }
 function setTarget(tg) {
   S.target = tg; store.set("oc.target", tg);
   S.aligned = false;
   if (tg.kind === "sat") loadSats();
-  schedulePlanes();
+  schedulePlanes(); scheduleShips();
   renderTargetBtn();
   lastExtraKey = "";
 }
@@ -660,7 +726,7 @@ function frame() {
   if (cur && cur.az != null) {
     mk.style.display = "";
     mk.setAttribute("transform", `rotate(${cur.az - S.heading} 200 200)`);
-    mk.classList.toggle("below", cur.el < 0 && !cur.place);
+    mk.classList.toggle("below", cur.el < 0 && !cur.place && !cur.surface);
     const dlt = angDiff(cur.az, S.heading), ad = Math.abs(dlt);
     const aligned = ad <= 6;
     if (aligned && !S.aligned && navigator.vibrate) navigator.vibrate(35);
@@ -668,14 +734,15 @@ function frame() {
     dial.classList.toggle("aligned", aligned);
     $("#delta").textContent = aligned ? "✓" : `${dlt > 0 ? "→" : "←"} ${Math.round(ad)}°`;
     let sub = aligned ? t().onTarget : dlt > 0 ? t().turnR : t().turnL;
-    if (cur.el < -0.5 && !cur.place) sub += ` · ${t().below}`;
+    if (cur.el < -0.5 && !cur.place && !cur.surface) sub += ` · ${t().below}`;
     $("#deltaSub").textContent = sub;
     $("#elTarget").style.bottom = `${clamp((cur.el + 10), 0, 100)}%`;
     $("#elTarget").style.display = "";
   } else {
     mk.style.display = "none"; dial.classList.remove("aligned");
     $("#delta").textContent = "—";
-    $("#deltaSub").textContent = cur && cur.lost ? t().planeLost : !S.loc ? t().gpsWait : t().loading;
+    $("#deltaSub").textContent = cur && cur.lost ? (S.target.kind === "ship" ? t().shipLost : t().planeLost)
+      : !S.loc ? t().gpsWait : S.target.kind === "ship" && S.shipsStatus === "nokey" ? t().shipsNoKey : t().loading;
     $("#elTarget").style.display = "none";
   }
   const ph = $("#elPhone");
@@ -686,7 +753,10 @@ function ro(label, val) { return `<div class="ro"><b>${val}</b><span>${esc(label
 function renderReadouts(r) {
   if (!r || r.az == null) { $("#readouts").innerHTML = ""; return; }
   const cells = [ro(t().bearing, `${Math.round(r.az)}° ${esc(cardinal(r.az))}`)];
-  if (r.plane) {
+  if (r.ship) {
+    cells.push(ro(t().dist, fmtKm(r.distKm)));
+    cells.push(ro(t().speed, `${Math.round(r.ship.sog * 1.852)} km/h`));
+  } else if (r.plane) {
     cells.push(ro(t().dist, fmtKm(r.ground)));
     cells.push(ro(t().alt, `${Math.round(r.plane.altFt * 0.3048).toLocaleString()} ${t().m}`));
   } else {
@@ -725,7 +795,12 @@ function renderExtra(r, now) {
     const routeHtml = rt ? t().route(esc(rt.from), esc(rt.to)) : rt === false ? t().routeUnknown : t().loading;
     html += note(routeHtml, "", [t().acType(esc(p.type), esc(p.reg)), `${Math.round(p.gs * 1.852)} km/h`, t().updated(Math.round((now - S.planesAt) / 1000))].filter(Boolean).join(" · "));
   }
+  if (r && r.ship) {
+    const s = r.ship;
+    html += note(`<b>${esc(shipName(s))}</b>`, "", [esc(shipType(s.type)), s.dest ? esc(t().dest(s.dest)) : "", t().updated(Math.round((now - s.seenAt) / 1000))].filter(Boolean).join(" · "));
+  }
   if (r && r.pending && S.target.kind === "plane" && !CFG.FLIGHT_PROXY) html += note(t().planesNoProxy, "warn");
+  if (r && r.pending && S.target.kind === "ship") html += note(!CFG.FLIGHT_PROXY ? t().shipsNoProxy : S.shipsStatus === "nokey" ? t().shipsNoKey : S.shipsStatus === "err" ? t().shipsErr : t().shipsLoading, "warn");
   if (html !== lastExtraKey) { $("#extra").innerHTML = html; lastExtraKey = html; }
 }
 function renderStatus() {
@@ -812,29 +887,44 @@ function renderList() {
                       : `<p class="empty">${esc(t().satNone)}</p>`;
     }
   }
-  if (S.tab === "ships") h += `<p class="empty">${esc(t().shipsText)}</p>`;
+  if (S.tab === "ships") {
+    if (!CFG.FLIGHT_PROXY) h += `<p class="empty">${esc(t().shipsNoProxy)}</p>`;
+    else if (S.shipsStatus === "nokey") h += `<p class="empty">${esc(t().shipsNoKey)}</p>`;
+    else {
+      h += item({ kind: "ship", id: "nearest", title: t().nearestShip, sub: t().nearestShipSub, name: t().nearestShip });
+      if (S.shipsStatus === "loading" && !S.ships.length) h += `<p class="empty">${esc(t().shipsLoading)}</p>`;
+      else if (S.shipsStatus === "err" && !S.ships.length) h += `<p class="empty">${esc(t().shipsErr)}</p>`;
+      else if (!S.ships.length && S.shipsStatus === "ok") h += `<p class="empty">${esc(t().shipsNone)}</p>`;
+      else if (L) {
+        const rows = S.ships.map((s) => ({ s, l: shipLook(s, now, L) })).sort((a, b) => a.l.distKm - b.l.distKm).slice(0, 40);
+        h += rows.map(({ s, l }) => item({ kind: "ship", id: s.id, title: shipName(s), name: shipName(s),
+          sub: [shipType(s.type), s.sog > 0.5 ? `\u2066${Math.round(s.sog * 1.852)} km/h\u2069` : "", s.dest ? `\u2066${s.dest}\u2069` : ""].filter(Boolean).join(" · "),
+          meta: metaFor(l.az, l.distKm) })).join("");
+      }
+    }
+  }
   $("#list").innerHTML = h;
 }
 function refreshListIf(tab) { if ($("#picker").open && S.tab === tab) renderList(); }
 let listTimer = null;
 function openPicker() {
-  if (S.target.kind === "plane") S.tab = "planes"; else if (S.target.kind === "sat" || S.target.kind === "sky") S.tab = "space"; else S.tab = "places";
+  if (S.target.kind === "plane") S.tab = "planes"; else if (S.target.kind === "ship") S.tab = "ships"; else if (S.target.kind === "sat" || S.target.kind === "sky") S.tab = "space"; else S.tab = "places";
   renderList();
   $("#picker").showModal();
   if (S.tab === "space") loadSats();
-  schedulePlanes();
+  schedulePlanes(); scheduleShips();
   clearInterval(listTimer);
   listTimer = setInterval(() => { if ($("#picker").open && S.tab !== "places") renderList(); }, 3000);
 }
 $("#pickBtn").addEventListener("click", openPicker);
 $("#pickClose").addEventListener("click", () => $("#picker").close());
-$("#picker").addEventListener("close", () => { clearInterval(listTimer); schedulePlanes(); });
+$("#picker").addEventListener("close", () => { clearInterval(listTimer); schedulePlanes(); scheduleShips(); });
 $("#picker").addEventListener("click", (e) => { if (e.target === $("#picker")) $("#picker").close(); });
 $("#tabs").addEventListener("click", (e) => {
   const b = e.target.closest("[data-tab]"); if (!b) return;
   S.tab = b.dataset.tab;
   if (S.tab === "space") loadSats();
-  renderList(); schedulePlanes();
+  renderList(); schedulePlanes(); scheduleShips();
 });
 $("#list").addEventListener("click", (e) => {
   const del = e.target.closest("[data-del]");
@@ -872,7 +962,7 @@ $("#startBtn").addEventListener("click", async () => {
   startLocation();                                    // first, synchronously inside the tap
   await startOrientation();                           // iOS motion permission also needs the tap
   if (S.target.kind === "sat") loadSats();
-  schedulePlanes();
+  schedulePlanes(); scheduleShips();
   requestAnimationFrame(frame);
 });
 
