@@ -810,7 +810,7 @@ function renderStatus() {
 }
 
 /* ============================ picker ============================ */
-const TABS = ["places", "planes", "space", "ships"];
+const TABS = ["places", "planes", "space"];          // "ships" is built but hidden: add it back here once the worker has AIS_KEY
 function renderTabs() {
   const label = { places: t().tabPlaces, planes: t().tabPlanes, space: t().tabSpace, ships: t().tabShips };
   $("#tabs").innerHTML = TABS.map((k) => `<button type="button" class="tab" role="tab" aria-selected="${S.tab === k}" data-tab="${k}">${label[k]}</button>`).join("");
