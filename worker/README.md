@@ -1,15 +1,10 @@
-# Flights proxy
+# Data proxy (Cloudflare Worker)
 
-Live aircraft sources (adsb.lol, OpenSky, airplanes.live) block direct browser requests (no CORS headers).
-`flights-proxy.js` is a tiny Cloudflare Worker that fetches adsb.lol for the compass and adds the header.
+Live aircraft sources block direct browser requests (no CORS), and the ships source (aisstream.io) needs a private key.
+`flights-proxy.js` runs on Cloudflare and serves both, adding the CORS header and keeping the key server-side.
 
-## Deploy (free, about 5 minutes)
-1. Sign in at https://dash.cloudflare.com → **Workers & Pages** → **Create** → **Create Worker**.
-2. Name it `flights-proxy`, click **Deploy**, then **Edit code**.
-3. Replace everything with the contents of `flights-proxy.js`, click **Deploy**.
-4. Copy the worker URL (looks like `https://flights-proxy.<you>.workers.dev`).
-5. Paste it into `api-project/config.js` → `FLIGHT_PROXY`, commit and push.
+- Deployed as `object-compass-proxy` → https://object-compass-proxy.eliran-dayan.workers.dev
+- `/?lat=..&lon=..&r=..` aircraft (adsb.lol), `/ships?lat=..&lon=..&r=..` ships (aisstream.io)
+- Secret `AIS_KEY` (aisstream.io API key): Cloudflare dashboard → Workers & Pages → object-compass-proxy → Settings → Variables and Secrets → Add → type Secret.
 
-Test: open `https://flights-proxy.<you>.workers.dev/?lat=32.79&lon=34.99&r=60` in a browser. You should see JSON with an `ac` list.
-
-Data: [adsb.lol](https://adsb.lol) (ODbL). Routes: [adsbdb](https://www.adsbdb.com).
+To update the code: dashboard → object-compass-proxy → Edit code → paste this file → Deploy.
